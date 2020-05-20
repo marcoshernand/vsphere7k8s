@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demochat
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demochat
+  template:
+    metadata:
+      labels:
+        app: demochat
+    spec:
+      containers:
+        - name: demochat
+          image: docker.io/containers101/demochat:2.0
+          ports:
+            - name: web
+              containerPort: 5000
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: demochat
+spec:
+  type: LoadBalancer
+  selector:
+    app: demochat
+  ports:
+    - name: http
+      protocol: TCP
+      port: 5000
+      targetPort: web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongo
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          image: docker.io/library/mongo:latest
+          ports:
+            - name: mongo
+              containerPort: 27017
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+spec:
+  type: ClusterIP
+  selector:
+    app: mongo
+  ports:
+    - name: mongo
+      protocol: TCP
+      port: 27017
+      targetPort: mongo
